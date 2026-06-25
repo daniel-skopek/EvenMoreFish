@@ -128,7 +128,7 @@ public class Rarity extends ConfigBase implements IRarity {
         }
         String displayName = getConfig().getString("displayname");
         if (displayName != null) {
-            return EMFSingleMessage.fromString(displayName);
+            return format(displayName);
         }
         String finalName = getId();
         if (!getUseConfigCasing()) {

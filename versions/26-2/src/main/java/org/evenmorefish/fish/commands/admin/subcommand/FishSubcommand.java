@@ -1,6 +1,7 @@
 package org.evenmorefish.fish.commands.admin.subcommand;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -14,9 +15,13 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.evenmorefish.fish.commands.BrigCommandUtils;
 import org.evenmorefish.fish.commands.arguments.FishArgument;
 import org.evenmorefish.fish.commands.arguments.RarityArgument;
@@ -54,6 +59,15 @@ public class FishSubcommand {
                                         Commands.argument("targets", ArgumentTypes.players())
                                             // [rarity] [fish-name] [quantity] [targets]
                                             .executes(ctx -> execute(ctx, true))
+                                            .then(
+                                                Commands.argument("fisherman", StringArgumentType.word())
+                                                    .suggests((suggestCtx, builder) -> {
+                                                        Bukkit.getOnlinePlayers().forEach(player -> builder.suggest(player.getName()));
+                                                        return builder.buildFuture();
+                                                    })
+                                                    // [rarity] [fish-name] [quantity] [targets] [fisherman]
+                                                    .executes(ctx -> execute(ctx, true))
+                                            )
                                     )
                             )
                     )
@@ -66,16 +80,19 @@ public class FishSubcommand {
         String fishStr = ctx.getArgument("fish", String.class);
         int amount = BrigCommandUtils.getArgumentOrDefault(ctx, "amount", int.class, 1);
         PlayerSelectorArgumentResolver targets = BrigCommandUtils.getArgumentOrNull(ctx, "targets", PlayerSelectorArgumentResolver.class);
+        String fishermanName = BrigCommandUtils.getArgumentOrNull(ctx, "fisherman", String.class);
+        OfflinePlayer fisherman = resolveFisherman(fishermanName);
         return execute(
             sender,
             rarity,
             fishStr,
             amount,
-            BrigCommandUtils.resolvePlayers(ctx, targets)
+            BrigCommandUtils.resolvePlayers(ctx, targets),
+            fisherman
         );
     }
 
-    private int execute(CommandSender sender, IRarity rarity, String fishStr, int amount, List<Player> targets) throws CommandSyntaxException {
+    private int execute(CommandSender sender, IRarity rarity, String fishStr, int amount, List<Player> targets, @Nullable OfflinePlayer fisherman) throws CommandSyntaxException {
         if (targets.isEmpty()) {
             if (!(sender instanceof Player player)) {
                 throw BrigCommandUtils.ERROR_NO_PLAYERS.create();
@@ -94,7 +111,7 @@ public class FishSubcommand {
 
             fish.getCatchRewards().forEach(reward -> reward.give(target, target.getLocation()));
 
-            fish.setFisherman(target);
+            fish.setFisherman(fisherman != null ? fisherman : target);
 
             final ItemStack fishItem = fish.give();
             fishItem.setAmount(amount);
@@ -108,6 +125,18 @@ public class FishSubcommand {
         message.setFishCaught(initialFish.getId());
         message.send(sender);
         return 1;
+    }
+
+    @SuppressWarnings("deprecation")
+    private static @Nullable OfflinePlayer resolveFisherman(@Nullable String name) {
+        if (name == null || name.isBlank()) {
+            return null;
+        }
+        Player online = Bukkit.getPlayerExact(name);
+        if (online != null) {
+            return online;
+        }
+        return Bukkit.getOfflinePlayer(name);
     }
 
 }

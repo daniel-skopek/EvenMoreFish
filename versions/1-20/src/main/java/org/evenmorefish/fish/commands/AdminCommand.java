@@ -36,6 +36,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.evenmorefish.fish.commands.arguments.ArgumentHelper;
@@ -91,7 +92,11 @@ public class AdminCommand {
                 RarityArgument.create(),
                 FishArgument.create(),
                 new IntegerArgument("amount", 1).setOptional(true),
-                new EntitySelectorArgument.ManyPlayers("targets").setOptional(true)
+                new EntitySelectorArgument.ManyPlayers("targets").setOptional(true),
+                ArgumentHelper.getAsyncStringsArgument(
+                    "fisherman",
+                    info -> Bukkit.getOnlinePlayers().stream().map(Player::getName).toArray(String[]::new)
+                ).setOptional(true)
             )
             .executes((sender, arguments) -> {
                 final Fish initialFish = arguments.getUnchecked("fish");
@@ -111,13 +116,15 @@ public class AdminCommand {
                     return;
                 }
 
+                final OfflinePlayer fisherman = resolveFisherman((String) arguments.getOptional("fisherman").orElse(null));
+
                 for (Player target : targets) {
                     Fish fish = initialFish.createCopy();
                     fish.init();
 
                     fish.getCatchRewards().forEach(reward -> reward.give(target, target.getLocation()));
 
-                    fish.setFisherman(target);
+                    fish.setFisherman(fisherman != null ? fisherman : target);
 
                     final ItemStack fishItem = fish.give();
                     fishItem.setAmount(amount);
@@ -202,6 +209,18 @@ public class AdminCommand {
                 message.setFishCaught(fish.getId());
                 message.send(sender);
             });
+    }
+
+    @SuppressWarnings("deprecation")
+    private static OfflinePlayer resolveFisherman(String name) {
+        if (name == null || name.isBlank()) {
+            return null;
+        }
+        Player online = Bukkit.getPlayerExact(name);
+        if (online != null) {
+            return online;
+        }
+        return Bukkit.getOfflinePlayer(name);
     }
 
     private CommandAPICommand getList() {

@@ -7,7 +7,8 @@ import com.oheers.fish.addons.external.reward.GPClaimBlocksRewardType;
 import com.oheers.fish.addons.external.reward.McMMOXPRewardType;
 import com.oheers.fish.addons.external.reward.MoneyRewardType;
 import com.oheers.fish.addons.external.reward.PermissionRewardType;
-import com.oheers.fish.addons.external.reward.PlayerPointsRewardType;
+// TEMP: PlayerPoints disabled - host repo.rosewooddev.io is offline.
+// import com.oheers.fish.addons.external.reward.PlayerPointsRewardType;
 import com.oheers.fish.addons.internal.item.Head64ItemAddon;
 import com.oheers.fish.addons.internal.requirement.ActiveCompetitionRequirementType;
 import com.oheers.fish.addons.internal.requirement.BiomeRequirementType;
@@ -125,7 +126,8 @@ public class InternalAddonLoader extends AddonLoader {
     private void loadExternalRewardTypes() {
         DependencyManager dependencyManager = EvenMoreFish.getInstance().getDependencyManager();
         if (dependencyManager.isUsingPlayerPoints()) {
-            new PlayerPointsRewardType().register();
+            // TEMP: PlayerPoints disabled - host repo.rosewooddev.io is offline.
+            // new PlayerPointsRewardType().register();
         }
         if (dependencyManager.isUsingGriefPrevention()) {
             new GPClaimBlocksRewardType().register();

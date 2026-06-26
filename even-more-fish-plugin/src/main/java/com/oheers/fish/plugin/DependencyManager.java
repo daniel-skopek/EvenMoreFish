@@ -5,7 +5,8 @@ import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.economy.EconomyType;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.economy.GriefPreventionEconomyType;
-import com.oheers.fish.economy.PlayerPointsEconomyType;
+// TEMP: PlayerPoints disabled - host repo.rosewooddev.io is offline.
+// import com.oheers.fish.economy.PlayerPointsEconomyType;
 import com.oheers.fish.economy.VaultEconomyType;
 import com.oheers.fish.events.AuraSkillsFishingEvent;
 import com.oheers.fish.events.DeprecatedEventListener;
@@ -154,7 +155,8 @@ public class DependencyManager implements Listener {
 
     public void loadPlayerPointsEconomy() {
         if (isUsingPlayerPoints()) {
-            loadEconomyType(new PlayerPointsEconomyType(), "PlayerPoints");
+            // TEMP: PlayerPoints disabled - host repo.rosewooddev.io is offline.
+            // loadEconomyType(new PlayerPointsEconomyType(), "PlayerPoints");
         }
     }
 

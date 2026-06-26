@@ -24,6 +24,17 @@ java {
     }
 }
 
+// TEMP: PlayerPoints support is temporarily disabled because its only host
+// (repo.rosewooddev.io) is offline. Remove this block to restore it.
+sourceSets {
+    main {
+        java {
+            exclude("com/oheers/fish/economy/PlayerPointsEconomyType.java")
+            exclude("com/oheers/fish/addons/external/reward/PlayerPointsRewardType.java")
+        }
+    }
+}
+
 
 dependencies {
     api(project(":even-more-fish-api"))
@@ -60,7 +71,8 @@ dependencies {
         exclude("com.sk89q.worldguard", "worldguard-legacy")
     }
     compileOnly(libs.headdatabase.api)
-    compileOnly(libs.playerpoints)
+    // TEMP: PlayerPoints disabled - host repo.rosewooddev.io is offline.
+    // compileOnly(libs.playerpoints)
 
     implementation(libs.bstats)
     implementation(libs.inventorygui)

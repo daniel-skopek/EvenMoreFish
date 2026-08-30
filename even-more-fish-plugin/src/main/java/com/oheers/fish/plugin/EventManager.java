@@ -8,6 +8,7 @@ import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.events.FishInteractEvent;
 import com.oheers.fish.events.JoinChecker;
 import com.oheers.fish.fishing.EMFFishListener;
+import com.oheers.fish.fishing.FishPickupListener;
 import com.oheers.fish.fishing.exploits.ExploitListener;
 import com.oheers.fish.fishing.processors.FishingProcessor;
 import com.oheers.fish.fishing.processors.HuntingProcessor;
@@ -37,6 +38,7 @@ public class EventManager {
         pm.registerEvents(new JoinChecker(), plugin);
         pm.registerEvents(new FishingProcessor(), plugin);
         pm.registerEvents(new HuntingProcessor(), plugin);
+        pm.registerEvents(new FishPickupListener(), plugin);
         pm.registerEvents(new SkullSaver(), plugin);
         pm.registerEvents(new UpdateNotify(), plugin);
         pm.registerEvents(new BaitApplicationListener(), plugin);
